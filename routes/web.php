@@ -1,0 +1,49 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\TestController;
+use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\CitasDisponiblesController;
+use App\Http\Controllers\Auth\RegisterController;
+
+// Ruta principal
+Route::get('/', function () {
+    return view('welcome');
+});
+
+// Rutas de autenticación
+Auth::routes();
+
+// Ruta para el registro de usuarios
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
+
+// Ruta a la página principal después de iniciar sesión
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+// Ruta para cargar el contenido dinámico del panel
+Route::get('/home/panel-content', [HomeController::class, 'panelContent'])->name('home.panelContent');
+
+// Ruta para obtener las citas disponibles
+Route::get('/citas', [CitasDisponiblesController::class, 'index'])->name('citas.index');
+
+// Ruta para cargar las citas
+Route::get('/appointments/content', [AppointmentController::class, 'getAppointmentsContent'])->name('appointments.content');
+
+// Rutas relacionadas con el Test
+Route::get('/admin/tests', [TestController::class, 'show'])->name('tests.show');
+Route::post('/admin/tests', [TestController::class, 'submit'])->name('tests.submit');
+
+// Agrupar rutas que requieren autenticación
+Route::middleware(['auth'])->group(function () {
+    // Rutas para las citas
+    Route::get('/appointments', [AppointmentController::class, 'index'])->name('appointments.index');
+    Route::post('/appointments', [AppointmentController::class, 'store'])->name('appointments.store');
+
+    // Ruta para completar el test y agendar una cita
+    Route::post('/complete-test', [HomeController::class, 'completeTest'])->name('complete.test');
+
+    // Rutas para citas disponibles
+    Route::get('/admin/citas_disponibles', [CitasDisponiblesController::class, 'index'])->name('citas_disponibles.index');
+});
