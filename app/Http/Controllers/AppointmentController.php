@@ -22,43 +22,54 @@ class AppointmentController extends Controller
         if ($request->has('cita_id')) {
             // Lógica para agendar desde las citas disponibles
             $citaDisponible = CitaDisponible::findOrFail($request->cita_id);
+            $appointmentDate = Carbon::parse($citaDisponible->fecha . ' ' . $citaDisponible->hora);
 
             // Crear una nueva cita basada en la cita disponible
             Appointment::create([
                 'user_id' => Auth::id(),
-                'appointment_date' => Carbon::parse($citaDisponible->fecha . ' ' . $citaDisponible->hora),
+                'appointment_date' => $appointmentDate,
                 'description' => 'Cita para ' . $citaDisponible->especialidad,
             ]);
 
             // Eliminar la cita disponible
             $citaDisponible->delete();
 
-            // Redirigir con un mensaje de éxito
-            return redirect()->route('citas.index')->with('success', 'Cita agendada correctamente.');
+            // Mensaje que incluye la fecha de la cita y prioridad
+            $message = 'Cita para: ' . $appointmentDate->format('d/m/Y H:i') . ' Cita programada con prioridad: MEDIA';
+
+            return redirect()->route('citas.index')->with('success', $message);
         } else {
             // Lógica para agendar directamente desde el test o desde una solicitud genérica
             $request->validate([
                 'appointment_date' => 'required|date',
-                'description' => 'required|string|max:255',
             ]);
 
             // Crear una nueva cita
+            $appointmentDate = Carbon::parse($request->appointment_date);
             Appointment::create([
                 'user_id' => Auth::id(),
-                'appointment_date' => Carbon::parse($request->appointment_date),
-                'description' => $request->description,
+                'appointment_date' => $appointmentDate,
+                'description' => 'Cita programada luego de resolver el test',
             ]);
 
-            // Redirigir con un mensaje de éxito al completar el test
-            return redirect()->route('home')->with('success', 'Test realizado con éxito, se le agendó una cita.');
+            // Mensaje que incluye la fecha de la cita y prioridad
+            $message = 'Cita para: ' . $appointmentDate->format('d/m/Y H:i') . ' Cita programada con prioridad: MEDIA';
+
+            return redirect()->route('home')->with('success', $message);
         }
     }
 
     // Método para mostrar las citas del usuario autenticado
     public function index()
     {
-        $appointments = Appointment::where('user_id', auth()->id())->get();
-    
+        // Obtiene la fecha de ayer
+        $yesterday = now()->subDay();
+
+        // Recupera las citas del usuario que son posteriores a ayer
+        $appointments = Appointment::where('user_id', Auth::id())
+            ->where('appointment_date', '>', $yesterday)
+            ->get();
+
         return view('appointments', compact('appointments'));
     }
 }

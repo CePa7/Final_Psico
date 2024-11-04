@@ -334,17 +334,41 @@ return [
                 'url' => 'admin/lumina',
             ],
             [
-                'text' => 'Historial Psicológico',
+                'text' => 'Historial de citas',
                 'url' => 'admin/history',
             ],
             [
-                'text' => 'Tus citas',
+                'text' => 'Próximas citas',
                 'url' => '/appointments',
             ],
             [
                 'text' => 'Citas Disponibles',
                 'url' => '/admin/citas_disponibles', 
                 'class' => 'load-citas', 
+            ],
+        ],
+    ],
+
+    [
+        'text' => 'Análisis Estadístico',
+        'icon' => 'fas fa-fw fa-chart-area',
+        'submenu' => [
+            [
+                'text' => 'Rellenar Cita',
+                'url' => 'admin/RCita',
+                'id' => 'realizar-rellenar',
+            ],
+
+            [
+                'text' => 'Ver Datos',
+                'url' => 'admin/datos',
+                'id' => 'realizar-estadistica',
+            ],
+
+            [
+                'text' => 'Predecir',
+                'url' => 'admin/predecir',
+                'id' => 'realizar-prediccion',
             ],
         ],
     ],

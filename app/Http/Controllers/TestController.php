@@ -7,6 +7,7 @@ use App\Models\Test;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
 
 class TestController extends Controller
 {
@@ -35,32 +36,33 @@ class TestController extends Controller
             'medications' => 'required|in:Ninguno,Antidepresivo,Ansiedad',
             'relaxation_methods' => 'required|in:Yoga,Ejercicio,Meditación,Terapia',
         ]);
-    
+
         // Guardar las respuestas del test
         $testResponse = $this->saveTestResponse($request);
-    
-        // Verificar que se haya guardado el test correctamente
+
         if ($testResponse) {
-            // Crear la cita automáticamente
-            $this->createAppointment();
-    
-            // Redirigir al usuario con un mensaje de éxito
-            return redirect()->route('home')->with('test_registered', 'Test realizado con éxito, se le agendó una cita.');
+            // Enviar datos a la API para obtener predicción
+            $prediction = $this->getPrediction($request->all());
+
+            if ($prediction == 'ALTA') {
+                // Crear la cita automáticamente si se necesita
+                $this->createAppointment();
+                return redirect()->route('home')->with('test_result', 'Test registrado, se ha programado una cita.');
+            } else {
+                return redirect()->route('home')->with('test_result', 'Test registrado, gracias por realizarlo.');
+            }
         } else {
-            // Redirigir con un mensaje de error si falla el guardado
             return redirect()->back()->with('error', 'Error al registrar el test. Intente nuevamente.');
         }
     }
-    
+
     // Función para guardar las respuestas del test
     private function saveTestResponse(Request $request)
     {
-        // Obtener el usuario autenticado
         $user = Auth::user();
-    
-        // Guardar las respuestas del test
+
         return Test::create([
-            'user_id' => $user->id, // Asociar el test al usuario autenticado
+            'user_id' => $user->id,
             'full_name' => $request->full_name,
             'age' => $request->age,
             'previous_treatment' => $request->previous_treatment,
@@ -80,22 +82,30 @@ class TestController extends Controller
     // Función para crear una cita automáticamente
     private function createAppointment()
     {
-        // Obtener el usuario autenticado
         $user = Auth::user();
 
-        // Verificar que el usuario esté autenticado
         if (!$user) {
-            return; 
+            return;
         }
 
-        // Establecer la fecha de la cita para el día siguiente (ejemplo)
         $appointmentDate = Carbon::now()->addDay();
 
-        // Crear la cita
         Appointment::create([
             'user_id' => $user->id,
-            'appointment_date' => $appointmentDate, 
+            'appointment_date' => $appointmentDate,
             'description' => 'Cita programada después de registrar el test',
         ]);
+    }
+
+    // Función para enviar los datos a la API y obtener la predicción
+    private function getPrediction($data)
+    {
+        $client = new Client();
+        $response = $client->post('http://localhost:5000/predict', [
+            'json' => $data
+        ]);
+
+        $result = json_decode($response->getBody(), true);
+        return $result['prioridad'] ?? 'BAJA';
     }
 }

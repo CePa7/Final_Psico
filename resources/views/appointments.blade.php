@@ -16,7 +16,7 @@
                             Cita para: {{ $appointment->appointment_date->format('d/m/Y H:i') }}
                         </div>
                         <div class="card-body">
-                            <p>{{ $appointment->description }}</p>
+                            <p>{{ $appointment->description }}</p> <!-- Esto debe mostrar "Cita agendada con test" -->
                         </div>
                     </div>
                 </div>

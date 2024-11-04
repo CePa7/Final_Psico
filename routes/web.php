@@ -7,6 +7,10 @@ use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CitasDisponiblesController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\HistorialCitasController;
+use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\PrediccionController;
+
 
 // Ruta principal
 Route::get('/', function () {
@@ -46,4 +50,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas para citas disponibles
     Route::get('/admin/citas_disponibles', [CitasDisponiblesController::class, 'index'])->name('citas_disponibles.index');
+
+    Route::get('/admin/history', [HistorialCitasController::class, 'index'])->name('historial.citas.index');
+
+    Route::get('/admin/datos', [StatisticsController::class, 'index'])->name('statistics.index');
+
+    // Ruta para mostrar la vista de predicción y procesar la predicción
+    Route::match(['get', 'post'], '/admin/predecir', [PrediccionController::class, 'index'])->name('predecir.index');
+
+    //Route::get('/predecir', [PrediccionController::class, 'index'])->name('predecir.index');
+    Route::post('/predecir/procesar', [PrediccionController::class, 'procesar'])->name('predecir.procesar');
+
 });

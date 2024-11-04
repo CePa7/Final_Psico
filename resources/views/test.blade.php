@@ -6,11 +6,10 @@
     <h2>Realizar Test</h2>
 
     {{-- Mensajes de sesión --}}
-    @if (session('success'))
+    @if (session('test_registered'))
         <div class="alert alert-success">
-            {{ session('success') }}
+            {{ session('test_registered') }}
         </div>
-        <a href="{{ route('appointments.index') }}" class="btn btn-secondary mt-2">Ir a Tus Citas</a>
     @elseif (session('error'))
         <div class="alert alert-danger">
             {{ session('error') }}
