@@ -16,11 +16,25 @@
                             Cita para: {{ $appointment->appointment_date->format('d/m/Y H:i') }}
                         </div>
                         <div class="card-body">
-                            <p>{{ $appointment->description }}</p> <!-- Esto debe mostrar "Cita agendada con test" -->
+                            <p>{{ $appointment->description }}</p> <!-- Muestra la descripción de la cita -->
                         </div>
                     </div>
                 </div>
             @endforeach
         </div>
     @endif
+@stop
+
+@section('js')
+    <!-- Incluir Toastr -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script>
+        @if (session('success'))
+            toastr.success('{{ session('success') }}');
+        @elseif (session('error'))
+            toastr.error('{{ session('error') }}');
+        @endif
+    </script>
 @stop

@@ -10,6 +10,8 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\HistorialCitasController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\PrediccionController;
+use App\Http\Controllers\CitaController;
+use App\Http\Controllers\PersonalityTestController;
 
 
 // Ruta principal
@@ -61,4 +63,11 @@ Route::middleware(['auth'])->group(function () {
     //Route::get('/predecir', [PrediccionController::class, 'index'])->name('predecir.index');
     Route::post('/predecir/procesar', [PrediccionController::class, 'procesar'])->name('predecir.procesar');
 
+    Route::get('/admin/RCita', [CitaController::class, 'create'])->name('citas.create');
+    Route::post('/admin/RCita', [CitaController::class, 'store'])->name('citas.store');
+
+    Route::get('/admin/lumina', [PersonalityTestController::class, 'show'])->name('personality-test.blade');
+    Route::post('/admin/lumina', [PersonalityTestController::class, 'submit'])->name('personality-test.submit');
+    
+    
 });
